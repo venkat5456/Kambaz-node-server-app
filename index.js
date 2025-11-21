@@ -12,15 +12,27 @@ const db = require("./Kambaz/Database/index.js");
 const UserRoutes = require("./Kambaz/Users/routes.js");
 const CourseRoutes = require("./Kambaz/Courses/routes.js");
 const ModulesRoutes = require("./Kambaz/Modules/routes.js");
-const AssignmentsRoutes = require("./Kambaz/Assignments/routes.js");   // ⭐ NEW
-const EnrollmentsRoutes = require("./Kambaz/Enrollments/routes.js"); // ⭐ NEW
+const AssignmentsRoutes = require("./Kambaz/Assignments/routes.js");
+const EnrollmentsRoutes = require("./Kambaz/Enrollments/routes.js");
 
 const app = express();
 
-// ⭐ CORS MUST allow frontend request
+// ⭐ CORS configuration (Frontend: Vercel + Localhost)
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://a3-kambaz.vercel.app"
+];
+
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("❌ Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -44,8 +56,8 @@ Lab5(app);
 UserRoutes(app, db);
 CourseRoutes(app, db);
 ModulesRoutes(app, db);
-AssignmentsRoutes(app, db);   // <- ⭐ MUST BE HERE
-EnrollmentsRoutes(app, db);   // <- ⭐ MUST BE HERE
+AssignmentsRoutes(app, db);
+EnrollmentsRoutes(app, db);
 
 // ⭐ Server Start
 const port = process.env.PORT || 4000;
